@@ -1,4 +1,10 @@
 resource "aws_cloudfront_distribution" "cdn" {
+  lifecycle {
+    precondition {
+      condition     = (length(var.origins) != 0 && length(var.s3_origins) == 0 && length(var.custom_origins) == 0) || ((length(var.s3_origins) != 0 || length(var.custom_origins) != 0) && length(var.origins) == 0)
+      error_message = "Either var.origins must be populated, or one or both of var.s3_origins + var.custom_origins must be populated."
+    }
+  }
 
   dynamic "origin" {
     for_each = var.origins
@@ -24,6 +30,65 @@ resource "aws_cloudfront_distribution" "cdn" {
 
       dynamic "s3_origin_config" {
         for_each = toset(compact([for origin in var.origins : lookup(origin, "s3_origin_config", "")]))
+        content {
+          origin_access_identity = aws_cloudfront_origin_access_identity.oia[s3_origin_config.value].cloudfront_access_identity_path
+        }
+      }
+
+      dynamic "origin_shield" {
+        for_each = length(keys(lookup(origin.value, "origin_shield", {}))) == 0 ? [] : [origin.value.origin_shield]
+        content {
+          enabled              = lookup(origin_shield.value, "enabled", null)
+          origin_shield_region = lookup(origin_shield.value, "origin_shield_region", null)
+        }
+      }
+    }
+  }
+
+  dynamic "origin" {
+    for_each = var.custom_origins
+    iterator = origin
+    content {
+      connection_attempts = lookup(origin.value, "connection_attempts", null)
+      connection_timeout  = lookup(origin.value, "connection_timeout", null)
+      domain_name         = lookup(origin.value, "domain_name", null)
+      origin_id           = lookup(origin.value, "origin_id", lookup(origin.value, "domain_name", null))
+      origin_path         = lookup(origin.value, "origin_path", null)
+
+      dynamic "custom_origin_config" {
+        for_each = length(keys(lookup(origin.value, "custom_origin_config", {}))) == 0 ? [] : [origin.value.custom_origin_config]
+        content {
+          http_port                = lookup(custom_origin_config.value, "http_port", null)
+          https_port               = lookup(custom_origin_config.value, "https_port", null)
+          origin_keepalive_timeout = lookup(custom_origin_config.value, "origin_keepalive_timeout", null)
+          origin_protocol_policy   = lookup(custom_origin_config.value, "origin_protocol_policy", null)
+          origin_read_timeout      = lookup(custom_origin_config.value, "origin_read_timeout", null)
+          origin_ssl_protocols     = lookup(custom_origin_config.value, "origin_ssl_protocols", null)
+        }
+      }
+
+      dynamic "origin_shield" {
+        for_each = length(keys(lookup(origin.value, "origin_shield", {}))) == 0 ? [] : [origin.value.origin_shield]
+        content {
+          enabled              = lookup(origin_shield.value, "enabled", null)
+          origin_shield_region = lookup(origin_shield.value, "origin_shield_region", null)
+        }
+      }
+    }
+  }
+
+  dynamic "origin" {
+    for_each = var.s3_origins
+    iterator = origin
+    content {
+      connection_attempts = lookup(origin.value, "connection_attempts", null)
+      connection_timeout  = lookup(origin.value, "connection_timeout", null)
+      domain_name         = lookup(origin.value, "domain_name", null)
+      origin_id           = lookup(origin.value, "origin_id", lookup(origin.value, "domain_name", null))
+      origin_path         = lookup(origin.value, "origin_path", null)
+
+      dynamic "s3_origin_config" {
+        for_each = local.combined_s3_origins
         content {
           origin_access_identity = aws_cloudfront_origin_access_identity.oia[s3_origin_config.value].cloudfront_access_identity_path
         }
