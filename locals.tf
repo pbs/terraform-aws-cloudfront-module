@@ -8,9 +8,9 @@ locals {
   domain_name            = var.create_cname && length(local.cnames) > 0 ? aws_route53_record.dns[0].fqdn : aws_cloudfront_distribution.cdn.domain_name
 
   #1 Necessary because optional types aren't part of Terraform yet.
-  default_origin_id      = var.default_origin_id != null ? var.default_origin_id : length(var.origins) != 0 ? lookup(var.origins[0], "origin_id", var.origins[0].domain_name) : length(var.s3_origins) != 0 ? lookup(var.s3_origins[0], "origin_id", var.s3_origins[0].domain_name) : lookup(var.custom_origins[0], "origin_id", var.custom_origins[0].domain_name)
-  combined_s3_origins    = toset(compact(concat([for origin in var.origins : lookup(origin, "s3_origin_config", "")], [for origin in var.s3_origins : lookup(origin, "s3_origin_config", "")])))
-  
+  default_origin_id   = var.default_origin_id != null ? var.default_origin_id : length(var.origins) != 0 ? lookup(var.origins[0], "origin_id", var.origins[0].domain_name) : length(var.s3_origins) != 0 ? lookup(var.s3_origins[0], "origin_id", var.s3_origins[0].domain_name) : lookup(var.custom_origins[0], "origin_id", var.custom_origins[0].domain_name)
+  combined_s3_origins = toset(compact(concat([for origin in var.origins : lookup(origin, "s3_origin_config", "")], [for origin in var.s3_origins : lookup(origin, "s3_origin_config", "")])))
+
   # Default cache behavior policies
   lookup_default_cache_policy_id            = var.default_cache_policy_id == null
   default_cache_policy_id                   = var.default_cache_policy_id != null ? var.default_cache_policy_id : data.aws_cloudfront_cache_policy.cache_policy[0].id
