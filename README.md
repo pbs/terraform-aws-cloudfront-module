@@ -7,7 +7,7 @@
 Use this URL for the source of the module. See the usage examples below for more details.
 
 ```hcl
-github.com/pbs/terraform-aws-cloudfront-module?ref=0.0.1
+github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z
 ```
 
 ### Alternative Installation Methods
@@ -24,7 +24,7 @@ Integrate this module like so:
 
 ```hcl
 module "cloudfront" {
-  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=0.0.1"
+  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z"
 
   # Required Parameters
   primary_hosted_zone = "example.com"
@@ -52,11 +52,80 @@ module "cloudfront" {
 }
 ```
 
+### :warning: Warning
+
+Due to [#1](https://github.com/pbs/terraform-aws-cloudfront-module/issues/1), this module does not allow mixing of S3 origins and custom origins within the `origins` variable. In order to bypass this restriction, pending the general availability of optional object type attributes, use the `s3_origins` and `custom_origins` variables instead. Note that these variables cannot be used with the standard `origins` variable.
+
+This is tested within the [combo](/examples/combo/main.tf) example.
+
+e.g.
+
+```hcl
+module "service" {
+  source = "github.com/pbs/terraform-aws-ecs-service-module?ref=0.0.1"
+
+  name = "${var.product}-svc"
+
+  primary_hosted_zone = var.primary_hosted_zone
+
+  organization = var.organization
+  environment  = var.environment
+  product      = var.product
+  repo         = var.repo
+}
+
+module "s3" {
+  source = "github.com/pbs/terraform-aws-s3-module?ref=0.0.1"
+
+  force_destroy = true
+
+  organization = var.organization
+  environment  = var.environment
+  product      = var.product
+  repo         = var.repo
+}
+
+module "cloudfront" {
+  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z"
+
+  primary_hosted_zone = var.primary_hosted_zone
+
+  s3_origins     = [
+    {
+      domain_name      = module.s3.regional_domain_name
+      s3_origin_config = module.s3.name
+    }
+  ]
+  custom_origins = [
+    {
+      domain_name = module.service.domain_name
+      custom_origin_config = {
+        http_port                = 80
+        https_port               = 443
+        origin_keepalive_timeout = 5
+        origin_protocol_policy   = "https-only"
+        origin_read_timeout      = 30
+        origin_ssl_protocols = [
+          "TLSv1.2",
+        ]
+      }
+    }
+  ]
+
+  default_root_object = "index.html"
+
+  organization = var.organization
+  environment  = var.environment
+  product      = var.product
+  repo         = var.repo
+}
+```
+
 ## Adding This Version of the Module
 
 If this repo is added as a subtree, then the version of the module should be close to the version shown here:
 
-`0.0.1`
+`x.y.z`
 
 Note, however that subtrees can be altered as desired within repositories.
 
@@ -104,7 +173,6 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment (sharedtools, dev, staging, prod) | `string` | n/a | yes |
 | <a name="input_organization"></a> [organization](#input\_organization) | Organization using this module. Used to prefix tags so that they are easily identified as being from your organization | `string` | n/a | yes |
-| <a name="input_origins"></a> [origins](#input\_origins) | One or more origins for this distribution. | `list(any)` | n/a | yes |
 | <a name="input_primary_hosted_zone"></a> [primary\_hosted\_zone](#input\_primary\_hosted\_zone) | Name of the primary hosted zone for DNS. e.g. primary\_hosted\_zone = example.org --> service.example.org. | `string` | n/a | yes |
 | <a name="input_product"></a> [product](#input\_product) | Tag used to group resources according to product | `string` | n/a | yes |
 | <a name="input_repo"></a> [repo](#input\_repo) | Tag used to point to the repo using this module | `string` | n/a | yes |
@@ -116,6 +184,7 @@ No modules.
 | <a name="input_compress"></a> [compress](#input\_compress) | (optional) gzip compress response | `bool` | `true` | no |
 | <a name="input_create_cname"></a> [create\_cname](#input\_create\_cname) | (optional) create CNAME(s) that point to CloudFront distribution | `bool` | `true` | no |
 | <a name="input_custom_error_response"></a> [custom\_error\_response](#input\_custom\_error\_response) | (optional) set of one or more custom error response elements | `list(any)` | `[]` | no |
+| <a name="input_custom_origins"></a> [custom\_origins](#input\_custom\_origins) | One or more custom origins for this distribution. Only necessary if combining with s3\_origins. If defined, origins must be empty. | `list(any)` | `[]` | no |
 | <a name="input_default_behavior_allowed_methods"></a> [default\_behavior\_allowed\_methods](#input\_default\_behavior\_allowed\_methods) | (optional) default behavior allowed methods | `list(string)` | <pre>[<br>  "GET",<br>  "HEAD"<br>]</pre> | no |
 | <a name="input_default_behavior_cached_methods"></a> [default\_behavior\_cached\_methods](#input\_default\_behavior\_cached\_methods) | (optional) default behavior cached methods | `list(string)` | <pre>[<br>  "GET",<br>  "HEAD"<br>]</pre> | no |
 | <a name="input_default_behavior_function_arn"></a> [default\_behavior\_function\_arn](#input\_default\_behavior\_function\_arn) | (optional) default behavior function arn. If null, no function is associated with default behavior. | `string` | `null` | no |
@@ -135,9 +204,11 @@ No modules.
 | <a name="input_minimum_protocol_version"></a> [minimum\_protocol\_version](#input\_minimum\_protocol\_version) | (optional) tls minimum protocol version | `string` | `"TLSv1"` | no |
 | <a name="input_name"></a> [name](#input\_name) | (optional) name of the distribution. Used as the default for DNS creation when configured | `string` | `null` | no |
 | <a name="input_ordered_cache_behavior"></a> [ordered\_cache\_behavior](#input\_ordered\_cache\_behavior) | (optional) an ordered list of cache behaviors resource for this distribution | `list(any)` | `[]` | no |
+| <a name="input_origins"></a> [origins](#input\_origins) | One or more origins for this distribution. Must be defined unless s3\_origins or custom\_origins are defined. If defined, s3\_origins and custom\_origins must be empty. | `list(any)` | `[]` | no |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | (optional) price class for the distribution | `string` | `"PriceClass_100"` | no |
 | <a name="input_restriction_locations"></a> [restriction\_locations](#input\_restriction\_locations) | (optional) locations to use in access restriction (whitelist or blacklist based on restriction\_type) | `list(string)` | `[]` | no |
 | <a name="input_restriction_type"></a> [restriction\_type](#input\_restriction\_type) | (optional) type of restriction for CDN | `string` | `"none"` | no |
+| <a name="input_s3_origins"></a> [s3\_origins](#input\_s3\_origins) | One or more S3 origins for this distribution. Only necessary if combining with custom\_origins. If defined, origins must be empty. | `list(any)` | `[]` | no |
 | <a name="input_ssl_support_method"></a> [ssl\_support\_method](#input\_ssl\_support\_method) | (optional) ssl support method (one of vip or sni-only) | `string` | `"sni-only"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Extra tags | `map(string)` | `{}` | no |
 | <a name="input_viewer_protocol_policy"></a> [viewer\_protocol\_policy](#input\_viewer\_protocol\_policy) | (optional) viewer protocol policy | `string` | `"redirect-to-https"` | no |
