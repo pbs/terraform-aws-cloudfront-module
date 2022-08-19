@@ -110,6 +110,10 @@ resource "aws_cloudfront_distribution" "cdn" {
   default_root_object = var.default_root_object
   web_acl_id          = var.web_acl_id
 
+  # Unfortunately, this has to be ignored for now, as tflint doesn't support this yet.
+  # tflint-ignore: aws_cloudfront_distribution_invalid_http_version
+  http_version = var.http_version
+
   viewer_certificate {
     cloudfront_default_certificate = var.cloudfront_default_certificate
     acm_certificate_arn            = local.acm_arn

@@ -195,3 +195,9 @@ variable "default_response_headers_policy_name" {
   default     = null
   type        = string
 }
+
+variable "http_version" {
+  description = "(optional) The maximum HTTP version to support on the distribution. Allowed values are http1.1, http2, http2and3 and http3."
+  default     = "http2and3"
+  type        = string
+}
