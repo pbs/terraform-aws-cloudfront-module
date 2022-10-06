@@ -148,7 +148,7 @@ Below is automatically generated documentation on this Terraform module using [t
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.27.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.33.0 |
 
 ## Modules
 
