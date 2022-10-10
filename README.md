@@ -1,4 +1,4 @@
-# PBS TF cloudfront module
+# PBS TF CloudFront module
 
 ## Installation
 
@@ -7,7 +7,7 @@
 Use this URL for the source of the module. See the usage examples below for more details.
 
 ```hcl
-github.com/pbs/terraform-aws-cloudfront-module?ref=1.0.1
+github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z
 ```
 
 ### Alternative Installation Methods
@@ -24,7 +24,7 @@ Integrate this module like so:
 
 ```hcl
 module "cloudfront" {
-  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=1.0.1"
+  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z"
 
   # Required Parameters
   primary_hosted_zone = "example.com"
@@ -52,80 +52,11 @@ module "cloudfront" {
 }
 ```
 
-### :warning: Warning
-
-Due to [#1](https://github.com/pbs/terraform-aws-cloudfront-module/issues/1), this module does not allow mixing of S3 origins and custom origins within the `origins` variable. In order to bypass this restriction, pending the general availability of optional object type attributes, use the `s3_origins` and `custom_origins` variables instead. Note that these variables cannot be used with the standard `origins` variable.
-
-This is tested within the [combo](/examples/combo/main.tf) example.
-
-e.g.
-
-```hcl
-module "service" {
-  source = "github.com/pbs/terraform-aws-ecs-service-module?ref=0.0.1"
-
-  name = "${var.product}-svc"
-
-  primary_hosted_zone = var.primary_hosted_zone
-
-  organization = var.organization
-  environment  = var.environment
-  product      = var.product
-  repo         = var.repo
-}
-
-module "s3" {
-  source = "github.com/pbs/terraform-aws-s3-module?ref=0.0.1"
-
-  force_destroy = true
-
-  organization = var.organization
-  environment  = var.environment
-  product      = var.product
-  repo         = var.repo
-}
-
-module "cloudfront" {
-  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=1.0.1"
-
-  primary_hosted_zone = var.primary_hosted_zone
-
-  s3_origins     = [
-    {
-      domain_name      = module.s3.regional_domain_name
-      s3_origin_config = module.s3.name
-    }
-  ]
-  custom_origins = [
-    {
-      domain_name = module.service.domain_name
-      custom_origin_config = {
-        http_port                = 80
-        https_port               = 443
-        origin_keepalive_timeout = 5
-        origin_protocol_policy   = "https-only"
-        origin_read_timeout      = 30
-        origin_ssl_protocols = [
-          "TLSv1.2",
-        ]
-      }
-    }
-  ]
-
-  default_root_object = "index.html"
-
-  organization = var.organization
-  environment  = var.environment
-  product      = var.product
-  repo         = var.repo
-}
-```
-
 ## Adding This Version of the Module
 
 If this repo is added as a subtree, then the version of the module should be close to the version shown here:
 
-`1.0.1`
+`x.y.z`
 
 Note, however that subtrees can be altered as desired within repositories.
 
@@ -171,7 +102,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_environment"></a> [environment](#input\_environment) | Environment (sharedtools, dev, staging, prod) | `string` | n/a | yes |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment (sharedtools, dev, staging, qa, prod) | `string` | n/a | yes |
 | <a name="input_organization"></a> [organization](#input\_organization) | Organization using this module. Used to prefix tags so that they are easily identified as being from your organization | `string` | n/a | yes |
 | <a name="input_origins"></a> [origins](#input\_origins) | One or more origins for this distribution. | <pre>list(object({<br>    domain_name         = string<br>    connection_attempts = optional(number)<br>    connection_timeout  = optional(number)<br>    custom_header = optional(object({<br>      name  = string<br>      value = string<br>    }))<br>    custom_origin_config = optional(object({<br>      http_port                = optional(number)<br>      https_port               = optional(number)<br>      origin_keepalive_timeout = optional(number)<br>      origin_protocol_policy   = optional(string)<br>      origin_read_timeout      = optional(number)<br>      origin_ssl_protocols     = optional(list(string))<br>    }))<br>    origin_path      = optional(string)<br>    origin_id        = optional(string)<br>    s3_origin_config = optional(string)<br>    origin_shield = optional(object({<br>      enabled              = optional(bool)<br>      origin_shield_region = optional(string)<br>    }))<br>  }))</pre> | n/a | yes |
 | <a name="input_primary_hosted_zone"></a> [primary\_hosted\_zone](#input\_primary\_hosted\_zone) | Name of the primary hosted zone for DNS. e.g. primary\_hosted\_zone = example.org --> service.example.org. | `string` | n/a | yes |
