@@ -27,8 +27,7 @@ module "cloudfront" {
 
   primary_hosted_zone = var.primary_hosted_zone
 
-  s3_origins     = local.s3_origins
-  custom_origins = local.custom_origins
+  origins = concat(local.s3_origins, local.custom_origins)
 
   default_root_object = "index.html"
 

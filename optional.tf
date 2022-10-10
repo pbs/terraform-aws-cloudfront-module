@@ -145,7 +145,33 @@ variable "logging_config" {
 variable "ordered_cache_behavior" {
   description = "(optional) an ordered list of cache behaviors resource for this distribution"
   default     = []
-  type        = list(any)
+  type = list(object({
+    path_pattern     = string
+    target_origin_id = string
+
+    cache_policy_id            = string
+    origin_request_policy_id   = optional(string)
+    response_headers_policy_id = optional(string)
+
+    allowed_methods           = optional(list(string), ["GET", "HEAD"])
+    cached_methods            = optional(list(string), ["GET", "HEAD"])
+    compress                  = optional(bool, true)
+    field_level_encryption_id = optional(string)
+    viewer_protocol_policy    = optional(string, "redirect-to-https")
+    smooth_streaming          = optional(bool)
+    trusted_key_groups        = optional(list(string))
+    trusted_signers           = optional(list(string))
+
+    lambda_function_associations = optional(list(object({
+      event_type   = optional(string, "viewer-request")
+      lambda_arn   = string
+      include_body = optional(bool, false)
+    })))
+    function_associations = optional(list(object({
+      event_type   = optional(string, "viewer-request")
+      function_arn = string
+    })))
+  }))
 }
 
 variable "web_acl_id" {
