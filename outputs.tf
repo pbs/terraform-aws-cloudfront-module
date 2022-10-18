@@ -13,9 +13,9 @@ output "domain_name" {
   value       = local.domain_name
 }
 
-output "oia_arns" {
-  description = "Origin Access Identity ARNs"
-  value       = [for oia in aws_cloudfront_origin_access_identity.oia : oia.iam_arn]
+output "oac_id" {
+  description = "ID of the origin access identity"
+  value       = local.origin_access_control_id
 }
 
 output "default_cache_policy_id" {

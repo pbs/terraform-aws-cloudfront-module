@@ -7,8 +7,10 @@ locals {
   acm_arn                = var.acm_arn != null ? var.acm_arn : data.aws_acm_certificate.primary_acm_wildcard_cert[0].arn
   domain_name            = var.create_cname && length(local.cnames) > 0 ? aws_route53_record.dns[0].fqdn : aws_cloudfront_distribution.cdn.domain_name
 
-  default_origin_id   = var.default_origin_id != null ? var.default_origin_id : var.origins[0].origin_id != null ? var.origins[0].origin_id : var.origins[0].domain_name
-  combined_s3_origins = toset(compact([for origin in var.origins : lookup(origin, "s3_origin_config", "")]))
+  default_origin_id = var.default_origin_id != null ? var.default_origin_id : var.origins[0].origin_id != null ? var.origins[0].origin_id : var.origins[0].domain_name
+
+  combined_s3_origins      = toset(compact([for origin in var.origins : lookup(origin, "s3_origin_config", "")]))
+  origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
 
   # Default cache behavior policies
   lookup_default_cache_policy_id            = var.default_cache_policy_id == null
