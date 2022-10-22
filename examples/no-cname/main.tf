@@ -30,13 +30,13 @@ module "s3" {
 }
 
 module "s3_policy" {
-  source = "github.com/pbs/terraform-aws-s3-policy-module?ref=0.0.2"
+  source = "github.com/pbs/terraform-aws-s3-bucket-policy-module?ref=1.0.0"
 
   name = module.s3.name
-  cloudfront_oac_access_statement = {
+  cloudfront_oac_access_statements = [{
     cloudfront_arn = module.cloudfront.arn
     path           = "*"
-  }
+  }]
 
   product = var.product
 }
