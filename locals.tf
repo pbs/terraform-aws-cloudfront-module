@@ -5,10 +5,13 @@ locals {
   comment                = var.comment != null ? var.comment : "${local.aliases[0]} CDN."
   primary_hosted_zone_id = data.aws_route53_zone.primary_hosted_zone.zone_id
   acm_arn                = var.acm_arn != null ? var.acm_arn : data.aws_acm_certificate.primary_acm_wildcard_cert[0].arn
-  domain_name            = var.create_cname && length(local.cnames) > 0 ? aws_route53_record.dns[0].fqdn : aws_cloudfront_distribution.cdn.domain_name
 
-  default_origin_id   = var.default_origin_id != null ? var.default_origin_id : var.origins[0].origin_id != null ? var.origins[0].origin_id : var.origins[0].domain_name
-  combined_s3_origins = toset(compact([for origin in var.origins : lookup(origin, "s3_origin_config", "")]))
+  # The following try is a workaround to prevent errors during destroy
+  domain_name = var.create_cname && length(local.cnames) > 0 ? try(aws_route53_record.dns[0].fqdn, null) : aws_cloudfront_distribution.cdn.domain_name
+
+  default_origin_id = var.default_origin_id != null ? var.default_origin_id : var.origins[0].origin_id != null ? var.origins[0].origin_id : var.origins[0].domain_name
+
+  origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
 
   # Default cache behavior policies
   lookup_default_cache_policy_id            = var.default_cache_policy_id == null

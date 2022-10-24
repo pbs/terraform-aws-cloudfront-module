@@ -24,7 +24,7 @@ module "cloudfront" {
 }
 
 module "service" {
-  source = "github.com/pbs/terraform-aws-ecs-service-module?ref=0.0.1"
+  source = "github.com/pbs/terraform-aws-ecs-service-module?ref=2.1.3"
 
   name = "${var.product}-svc"
 

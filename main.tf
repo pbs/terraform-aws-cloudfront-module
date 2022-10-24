@@ -29,12 +29,7 @@ resource "aws_cloudfront_distribution" "cdn" {
         }
       }
 
-      dynamic "s3_origin_config" {
-        for_each = origin.value.s3_origin_config != null ? [origin.value.s3_origin_config] : []
-        content {
-          origin_access_identity = aws_cloudfront_origin_access_identity.oia[s3_origin_config.value].cloudfront_access_identity_path
-        }
-      }
+      origin_access_control_id = origin.value.s3_origin_config == null ? null : local.origin_access_control_id
 
       dynamic "origin_shield" {
         for_each = origin.value.origin_shield != null ? [origin.value.origin_shield] : []

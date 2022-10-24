@@ -1,4 +1,7 @@
-resource "aws_cloudfront_origin_access_identity" "oia" {
-  for_each = local.combined_s3_origins
-  comment  = "CloudFront origin access identity for bucket ${each.value}."
+resource "aws_cloudfront_origin_access_control" "oac" {
+  name                              = local.name
+  description                       = "Origin Access Control for ${local.name}"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }

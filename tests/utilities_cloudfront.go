@@ -28,21 +28,6 @@ func testCloudFront(t *testing.T, variant string) {
 	}
 
 	defer func() {
-		// This is a workaround due to the fact that AWS
-		// doesn't like it when an Origin Access Identity
-		// is still associated with a CloudFront distribution
-		// or bucket policy before being destroyed.
-		if variant != "basic" {
-			terraformDestroyOptions := &terraform.Options{
-				TerraformDir: terraformDir,
-				Targets: []string{
-					"module.cloudfront",
-					"aws_s3_bucket_policy.bucket_policy",
-				},
-				LockTimeout: "5m",
-			}
-			terraform.Destroy(t, terraformDestroyOptions)
-		}
 		terraform.Destroy(t, terraformOptions)
 	}()
 
@@ -50,21 +35,6 @@ func testCloudFront(t *testing.T, variant string) {
 	expectedDomainName := fmt.Sprintf("%s.%s", expectedName, primaryHostedZone)
 
 	terraform.Init(t, terraformOptions)
-
-	if variant != "basic" && variant != "policies" {
-		// This is a workaround due to the fact that Terraform
-		// doesn't like it when it can't figure out what resources
-		// are being created for a given piece of state without resolving
-		// dynamic inputs.
-		terraformTargetOptions := &terraform.Options{
-			TerraformDir: terraformDir,
-			Targets: []string{
-				"module.s3",
-			},
-			LockTimeout: "5m",
-		}
-		terraform.Apply(t, terraformTargetOptions)
-	}
 
 	if variant == "policies" {
 		// This is a workaround due to the fact that Terraform
