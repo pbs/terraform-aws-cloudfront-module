@@ -11,7 +11,6 @@ locals {
 
   default_origin_id = var.default_origin_id != null ? var.default_origin_id : var.origins[0].origin_id != null ? var.origins[0].origin_id : var.origins[0].domain_name
 
-  combined_s3_origins      = toset(compact([for origin in var.origins : lookup(origin, "s3_origin_config", "")]))
   origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
 
   # Default cache behavior policies
