@@ -24,7 +24,7 @@ locals {
 
   creator = "terraform"
 
-  tags = merge(
+  defaulted_tags = merge(
     var.tags,
     {
       Name                                      = local.name
@@ -34,4 +34,8 @@ locals {
       repo                                      = var.repo
     }
   )
+
+  tags = merge({ for k, v in local.defaulted_tags : k => v if lookup(data.aws_default_tags.common_tags.tags, k, "") != v })
 }
+
+data "aws_default_tags" "common_tags" {}
