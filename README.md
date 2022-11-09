@@ -7,7 +7,7 @@
 Use this URL for the source of the module. See the usage examples below for more details.
 
 ```hcl
-github.com/pbs/terraform-aws-cloudfront-module?ref=2.0.0
+github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z
 ```
 
 ### Alternative Installation Methods
@@ -24,7 +24,7 @@ Integrate this module like so:
 
 ```hcl
 module "cloudfront" {
-  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=2.0.0"
+  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z"
 
   # Required Parameters
   primary_hosted_zone = "example.com"
@@ -56,7 +56,7 @@ module "cloudfront" {
 
 If this repo is added as a subtree, then the version of the module should be close to the version shown here:
 
-`2.0.0`
+`x.y.z`
 
 Note, however that subtrees can be altered as desired within repositories.
 
@@ -96,6 +96,7 @@ No modules.
 | [aws_cloudfront_cache_policy.cache_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_cache_policy) | data source |
 | [aws_cloudfront_origin_request_policy.origin_request_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_origin_request_policy) | data source |
 | [aws_cloudfront_response_headers_policy.response_headers_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/cloudfront_response_headers_policy) | data source |
+| [aws_default_tags.common_tags](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/default_tags) | data source |
 | [aws_route53_zone.primary_hosted_zone](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
