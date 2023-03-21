@@ -100,10 +100,10 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
 
     dynamic "function_association" {
-      for_each = var.default_behavior_lambda_function_association != null ? [true] : []
+      for_each = var.default_behavior_function_association != null ? [true] : []
       content {
-        event_type   = var.default_behavior_lambda_function_association.event_type
-        function_arn = var.default_behavior_lambda_function_association.function_arn
+        event_type   = var.default_behavior_function_association.event_type
+        function_arn = var.default_behavior_function_association.function_arn
       }
     }
   }
