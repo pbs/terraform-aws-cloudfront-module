@@ -20,7 +20,6 @@ locals {
   default_origin_request_policy_id          = var.default_origin_request_policy_id != null ? var.default_origin_request_policy_id : local.lookup_default_origin_request_policy_id ? data.aws_cloudfront_origin_request_policy.origin_request_policy[0].id : null
   lookup_default_response_headers_policy_id = var.default_origin_request_policy_id == null && var.default_response_headers_policy_name != null
   default_response_headers_policy_id        = var.default_response_headers_policy_id != null ? var.default_response_headers_policy_id : local.lookup_default_response_headers_policy_id ? data.aws_cloudfront_response_headers_policy.response_headers_policy[0].id : null
-  add_default_behavior_function_association = var.default_behavior_function_arn != null
 
   creator = "terraform"
 

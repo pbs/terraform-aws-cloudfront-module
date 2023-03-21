@@ -58,16 +58,23 @@ variable "default_origin_id" {
   type        = string
 }
 
-variable "default_behavior_function_event_type" {
-  description = "(optional) default behavior function event type. If default_behavior_function_arn is null, this is ignored."
-  default     = "viewer-request"
-  type        = string
+variable "default_behavior_lambda_function_association" {
+  description = "(optional) default behavior lambda function association"
+  default     = null
+  type = object({
+    event_type   = string
+    lambda_arn   = string
+    include_body = optional(bool)
+  })
 }
 
-variable "default_behavior_function_arn" {
-  description = "(optional) default behavior function arn. If null, no function is associated with default behavior."
+variable "default_behavior_function_association" {
+  description = "(optional) default behavior function association"
   default     = null
-  type        = string
+  type = object({
+    event_type   = string
+    function_arn = string
+  })
 }
 
 variable "viewer_protocol_policy" {

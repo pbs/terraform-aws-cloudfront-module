@@ -90,11 +90,20 @@ resource "aws_cloudfront_distribution" "cdn" {
     origin_request_policy_id   = local.default_origin_request_policy_id
     response_headers_policy_id = local.default_response_headers_policy_id
 
-    dynamic "function_association" {
-      for_each = local.add_default_behavior_function_association ? [true] : []
+    dynamic "lambda_function_association" {
+      for_each = var.default_behavior_lambda_function_association != null ? [true] : []
       content {
-        event_type   = var.default_behavior_function_event_type
-        function_arn = var.default_behavior_function_arn
+        event_type   = var.default_behavior_lambda_function_association.event_type
+        lambda_arn   = var.default_behavior_lambda_function_association.lambda_arn
+        include_body = var.default_behavior_lambda_function_association.include_body
+      }
+    }
+
+    dynamic "function_association" {
+      for_each = var.default_behavior_lambda_function_association != null ? [true] : []
+      content {
+        event_type   = var.default_behavior_lambda_function_association.event_type
+        function_arn = var.default_behavior_lambda_function_association.function_arn
       }
     }
   }
