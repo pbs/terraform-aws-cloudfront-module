@@ -146,7 +146,11 @@ variable "custom_error_response" {
 variable "logging_config" {
   description = "(optional) logging configuration that controls how logs are written to your distribution (maximum one)"
   default     = []
-  type        = list(any)
+  type        = list(object({
+    logging_bucket  = string
+    logging_prefix  = optional(string)
+    logging_cookies = optional(bool, false)
+    }))
 }
 
 variable "ordered_cache_behavior" {
