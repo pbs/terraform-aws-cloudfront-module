@@ -7,7 +7,7 @@
 Use this URL for the source of the module. See the usage examples below for more details.
 
 ```hcl
-github.com/pbs/terraform-aws-cloudfront-module?ref=3.1.19
+github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z
 ```
 
 ### Alternative Installation Methods
@@ -24,7 +24,7 @@ Integrate this module like so:
 
 ```hcl
 module "cloudfront" {
-  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=3.1.19"
+  source = "github.com/pbs/terraform-aws-cloudfront-module?ref=x.y.z"
 
   # Required Parameters
   primary_hosted_zone = "example.com"
@@ -56,7 +56,7 @@ module "cloudfront" {
 
 If this repo is added as a subtree, then the version of the module should be close to the version shown here:
 
-`3.1.19`
+`x.y.z`
 
 Note, however that subtrees can be altered as desired within repositories.
 
@@ -134,7 +134,7 @@ No modules.
 | <a name="input_http_version"></a> [http\_version](#input\_http\_version) | (optional) The maximum HTTP version to support on the distribution. Allowed values are http1.1, http2, http2and3 and http3. | `string` | `"http2and3"` | no |
 | <a name="input_is_ipv6_enabled"></a> [is\_ipv6\_enabled](#input\_is\_ipv6\_enabled) | (optional) enable ipv6 | `bool` | `true` | no |
 | <a name="input_logging_config"></a> [logging\_config](#input\_logging\_config) | (optional) logging configuration that controls how logs are written to your distribution (maximum one) | <pre>list(object({<br>    logging_bucket  = string<br>    logging_prefix  = optional(string)<br>    logging_cookies = optional(bool, false)<br>  }))</pre> | `[]` | no |
-| <a name="input_minimum_protocol_version"></a> [minimum\_protocol\_version](#input\_minimum\_protocol\_version) | (optional) tls minimum protocol version | `string` | `"TLSv1"` | no |
+| <a name="input_minimum_protocol_version"></a> [minimum\_protocol\_version](#input\_minimum\_protocol\_version) | (optional) tls minimum protocol version | `string` | `"TLSv1.2_2021"` | no |
 | <a name="input_name"></a> [name](#input\_name) | (optional) name of the distribution. Used as the default for DNS creation when configured | `string` | `null` | no |
 | <a name="input_ordered_cache_behavior"></a> [ordered\_cache\_behavior](#input\_ordered\_cache\_behavior) | (optional) an ordered list of cache behaviors resource for this distribution | <pre>list(object({<br>    path_pattern     = string<br>    target_origin_id = string<br><br>    cache_policy_id            = string<br>    origin_request_policy_id   = optional(string)<br>    response_headers_policy_id = optional(string)<br><br>    allowed_methods           = optional(list(string), ["GET", "HEAD"])<br>    cached_methods            = optional(list(string), ["GET", "HEAD"])<br>    compress                  = optional(bool, true)<br>    field_level_encryption_id = optional(string)<br>    viewer_protocol_policy    = optional(string, "redirect-to-https")<br>    smooth_streaming          = optional(bool)<br>    trusted_key_groups        = optional(list(string))<br>    trusted_signers           = optional(list(string))<br><br>    lambda_function_associations = optional(list(object({<br>      event_type   = optional(string, "viewer-request")<br>      lambda_arn   = string<br>      include_body = optional(bool, false)<br>    })))<br>    function_associations = optional(list(object({<br>      event_type   = optional(string, "viewer-request")<br>      function_arn = string<br>    })))<br>  }))</pre> | `[]` | no |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | (optional) price class for the distribution | `string` | `"PriceClass_100"` | no |

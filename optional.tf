@@ -30,7 +30,7 @@ variable "cloudfront_default_certificate" {
 
 variable "minimum_protocol_version" {
   description = "(optional) tls minimum protocol version"
-  default     = "TLSv1"
+  default     = "TLSv1.2_2021"
   type        = string
 }
 
