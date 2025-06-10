@@ -238,3 +238,18 @@ variable "http_version" {
   default     = "http2and3"
   type        = string
 }
+
+variable "v2_logging" {
+  description = "(optional) enable v2 logging for the distribution"
+  default     = null
+  type = object({
+    s3_bucket_arn               = string
+    s3_prefix                   = optional(string, "cloudfront_access_logs")
+    suffix_path                 = optional(string, "/{accountid}/{distributionid}/{yyyy}/{MM}/{dd}/{HH}/")
+    output_format               = optional(string, "parquet")
+    suffix_path                 = optional(string, "/{accountid}/{distributionid}/{yyyy}/{MM}/{dd}/{HH}/")
+    enable_hive_compatible_path = optional(bool, true)
+    field_delimiter             = optional(string)
+    record_fields               = optional(list(string))
+  })
+}
