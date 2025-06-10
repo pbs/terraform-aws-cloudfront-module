@@ -247,7 +247,6 @@ variable "v2_logging" {
     s3_prefix                   = optional(string, "cloudfront_access_logs")
     suffix_path                 = optional(string, "/{accountid}/{distributionid}/{yyyy}/{MM}/{dd}/{HH}/")
     output_format               = optional(string, "parquet")
-    suffix_path                 = optional(string, "/{accountid}/{distributionid}/{yyyy}/{MM}/{dd}/{HH}/")
     enable_hive_compatible_path = optional(bool, true)
     field_delimiter             = optional(string)
     record_fields               = optional(list(string))
