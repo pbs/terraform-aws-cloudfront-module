@@ -75,7 +75,7 @@ locals {
 
   merged_record_fields = distinct(
     concat(local.default_record_fields,
-    coalesce(var.v2_logging != null ? var.v2_logging.record_fields : [], [])
+      coalesce(var.v2_logging != null ? var.v2_logging.record_fields : [], [])
   ))
 }
 
