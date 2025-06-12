@@ -35,6 +35,48 @@ locals {
   )
 
   tags = merge({ for k, v in local.defaulted_tags : k => v if lookup(data.aws_default_tags.common_tags.tags, k, "") != v })
+
+  default_record_fields = [
+    "date",
+    "time",
+    "timestamp",
+    "x-edge-location",
+    "sc-bytes",
+    "c-ip",
+    "cs-method",
+    "cs(Host)",
+    "cs-uri-stem",
+    "sc-status",
+    "cs(Referer)",
+    "cs(User-Agent)",
+    "cs-uri-query",
+    "cs(Cookie)",
+    "x-edge-result-type",
+    "x-edge-request-id",
+    "x-host-header",
+    "cs-protocol",
+    "cs-bytes",
+    "time-taken",
+    "x-forwarded-for",
+    "ssl-protocol",
+    "x-edge-response-result-type",
+    "cs-protocol-version",
+    "fle-status",
+    "fle-encrypted-fields",
+    "c-port",
+    "time-to-first-byte",
+    "x-edge-detailed-result-type",
+    "sc-content-type",
+    "sc-content-len",
+    "sc-range-start",
+    "sc-range-end",
+    "ssl-cipher"
+  ]
+
+  merged_record_fields = distinct(
+    concat(local.default_record_fields,
+      coalesce(var.v2_logging != null ? var.v2_logging.record_fields : [], [])
+  ))
 }
 
 data "aws_default_tags" "common_tags" {}
